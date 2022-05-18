@@ -5,6 +5,13 @@
   Считаем, что всегда передается тег, допускающий вставку текста в качестве своего содержимого (P, DIV, I и пр.).
 */
 export function appendToBody(tag, content, count) {
+    let k = 0;
+    while (k < count) {
+        let inserttag = document.createElement(tag);
+        inserttag.innerHTML = content;
+        document.body.appendChild(inserttag);
+        k++;
+    }
 }
 
 /*
@@ -15,6 +22,30 @@ export function appendToBody(tag, content, count) {
   Сформированное дерево верните в качестве результата работы функции.
 */
 export function generateTree(childrenCount, level) {
+    function wood(value, level) {
+        let k = value - 1;
+        let parent;
+        if (level > 0) {
+            if (document.getElementsByClassName('item_' + k).length == 0) {
+                parent = document.createElement('div');
+                document.body.appendChild(parent);
+                parent.setAttribute('class', 'item_' + value);
+                wood(value + 1, level - 1);
+            } else {
+                for (parent of document.getElementsByClassName('item_' + k)) {
+                    for (let i = 0; i < childrenCount; i++) {
+                        let child = document.createElement('div');
+                        child.setAttribute('class', 'item_' + value);
+                        parent.appendChild(child);
+                    }
+                }
+                wood(value + 1, level - 1);
+                return parent;
+            }
+        }
+        return parent;
+    }
+    return wood(1, level);
 }
 
 /*
@@ -26,4 +57,22 @@ export function generateTree(childrenCount, level) {
   Сформированное дерево верните в качестве результата работы функции.
 */
 export function replaceNodes() {
+    let tree = generateTree(2, 3);
+    let parent = document.getElementsByClassName('item_1')[0];
+    for (let node of document.getElementsByClassName('item_2')) {
+        if (node.tagName != 'SECTION') {
+            let newnode = document.createElement('SECTION');
+            newnode.setAttribute('class', 'item_2');
+            for (let i = 0; i < 2; i++) {
+                let child = node.firstChild;
+                newnode.appendChild(child);
+            }
+            parent.appendChild(newnode);
+        }
+    }
+    for (let i = 0; i < 2; i++) {
+        let deletenode = document.getElementsByClassName('item_2')[0];
+        parent.removeChild(deletenode);
+    }
+    return tree;
 }
